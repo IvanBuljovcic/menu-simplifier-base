@@ -60,11 +60,20 @@ def scrape_ingredients(url):
                 ingredients = []
                 print(f"Card {index}: Failed to retrieve ingredients.")
 
+            # Get image
+            try:
+                image_element = card.find_element(By.CSS_SELECTOR, 'img')
+                image_url = image_element.get_attribute('srcset')
+            except Exception:
+                image_element = None
+                print(f"Card {index}: Failed to retrieve image.")
+
             # Append the structured data
             items.append({
                 "name": name,
                 "ingredients": ingredients,
-                "price": price
+                "price": price,
+                "image": image_url,
             })
 
         except Exception as e:
