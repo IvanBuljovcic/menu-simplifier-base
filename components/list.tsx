@@ -6,7 +6,6 @@ import Ingredient from "./ingredient";
 import { Item } from "@/app/page";
 import { Button } from "./ui/button";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const List = ({ data = [] }: { data?: Item[] }) => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -18,16 +17,15 @@ const List = ({ data = [] }: { data?: Item[] }) => {
   }, [selected, data]);
 
   const ingredientCounts = useMemo(() => {
-    return uniqueIngredients.reduce((acc, ingredient) => {
-      let count;
-      if (selected?.length > 0) {
-        count = filteredMenuItems.filter((item) => item.ingredients.includes(ingredient)).length;
-      } else {
-        count = data.filter((item) => item.ingredients.includes(ingredient)).length;
-      }
+    return uniqueIngredients.reduce<Record<string, number>>((acc, ingredient) => {
+      const source = selected?.length > 0 ? filteredMenuItems : data;
 
-      return { ...acc, [ingredient]: count };
-    });
+      const count = source.filter((item) => item.ingredients.includes(ingredient)).length;
+
+      acc[ingredient] = count;
+
+      return acc;
+    }, {});
   }, [filteredMenuItems, selected, data, uniqueIngredients]);
 
   // Calculate which ingredients appear together with selected ones
@@ -44,15 +42,6 @@ const List = ({ data = [] }: { data?: Item[] }) => {
     return Array.from(validIngredients);
   }, [selected, data, uniqueIngredients]);
 
-  // Get filtered items count based on selection
-  const filteredItemsCount = useMemo(() => {
-    if (selected.length === 0) {
-      return data.length;
-    }
-
-    return data.filter((item) => selected.every((ing) => item.ingredients.includes(ing))).length;
-  }, [selected, data]);
-
   const renderEmpty = () => <h1>No items</h1>;
 
   const handleItemClick = (item: string) => {
@@ -62,7 +51,7 @@ const List = ({ data = [] }: { data?: Item[] }) => {
   };
 
   const renderMenuItem = (item: Item) => (
-    <div key={item.id} className="bg-white shadow-md p-4 rounded-lg w-64">
+    <div key={item.id} className="bg-white shadow-md p-4 rounded-lg w-52">
       {item.image && <img srcSet={item.image} alt={item.name} />}
 
       <h3 className="mb-2 font-semibold text-lg">{item.name}</h3>
