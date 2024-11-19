@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options
+from termcolor import cprint
 
 def scrape_ingredients(url):
     # Set up Selenium WebDriver with headless Edge
@@ -31,7 +32,8 @@ def scrape_ingredients(url):
     # Find all elements with data-test-id="horizontal-item-card"
     cards = driver.find_elements(By.CSS_SELECTOR, '[data-test-id="horizontal-item-card"]')
 
-    print(f"Found {len(cards)} cards")
+    # print(bcolors.INFO + f"Found {len(cards)} cards")
+    cprint(f"Found {len(cards)} cards", "black", "on_light_blue")
 
     items = []
     for index, card in enumerate(cards, start=1):
@@ -42,7 +44,7 @@ def scrape_ingredients(url):
                 name = title_element.text.strip() if title_element else "Unknown"
             except Exception:
                 name = "Unknown"
-                print(f"Card {index}: Failed to retrieve name.")
+                cprint(f"Card {index}: Failed to retrieve name.", "black", "on_red")
 
             # Extract the price
             try:
@@ -55,10 +57,10 @@ def scrape_ingredients(url):
             # Extract the ingredients
             try:
                 ingredients_element = card.find_element(By.CSS_SELECTOR, '[data-test-id="horizontal-item-card-header"] + p')
-                ingredients = [item.strip() for item in ingredients_element.text.split(",")] if ingredients_element else []
+                ingredients = [item.strip().lower() for item in ingredients_element.text.split(",")] if ingredients_element else []
             except Exception:
                 ingredients = []
-                print(f"Card {index}: Failed to retrieve ingredients.")
+                cprint(f"Card {index}: Failed to retrieve ingredients.", "black", "on_red")
 
             # Get image
             try:
@@ -66,7 +68,14 @@ def scrape_ingredients(url):
                 image_url = image_element.get_attribute('srcset')
             except Exception:
                 image_element = None
-                print(f"Card {index}: Failed to retrieve image.")
+                cprint(f"Card {index}: Failed to retrieve image.", "black", "on_red")
+
+            try:
+                item_child = card.find_element(By.CSS_SELECTOR, '[data-test-id="horizontal-item-card"] > div')
+                item_id = item_child.get_attribute('id')
+            except Exception:
+                item_id = None
+                cprint(f"Card {index}: Could not resolve ID", "black", "on_red")
 
             # Append the structured data
             items.append({
@@ -74,6 +83,7 @@ def scrape_ingredients(url):
                 "ingredients": ingredients,
                 "price": price,
                 "image": image_url,
+                "id": item_id,
             })
 
         except Exception as e:

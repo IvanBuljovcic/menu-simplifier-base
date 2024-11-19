@@ -35,7 +35,6 @@ const List = ({ data = [] }: { data?: Item[] }) => {
     if (selected.length === 0) return uniqueIngredients;
 
     const matchingItems = data.filter((item) => selected.every((ing) => item.ingredients.includes(ing)));
-    console.log("matchingItems: ", matchingItems);
 
     const validIngredients = new Set<string>();
     matchingItems.forEach((item) => {
@@ -63,7 +62,7 @@ const List = ({ data = [] }: { data?: Item[] }) => {
   };
 
   const renderMenuItem = (item: Item) => (
-    <div key={item.name} className="bg-white shadow-md p-4 rounded-lg w-64">
+    <div key={item.id} className="bg-white shadow-md p-4 rounded-lg w-64">
       {item.image && <img srcSet={item.image} alt={item.name} />}
 
       <h3 className="mb-2 font-semibold text-lg">{item.name}</h3>

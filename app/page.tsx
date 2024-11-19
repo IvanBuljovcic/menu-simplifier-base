@@ -6,6 +6,7 @@ export type Item = {
   ingredients: string[];
   price: string | "Unknown";
   image?: string;
+  id: string;
 };
 
 export default async function Home() {

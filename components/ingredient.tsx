@@ -21,7 +21,7 @@ const Ingredient = ({ isValid, count, item, onClick, isSelected }: IngredientPro
         htmlFor={item}
         className="flex-1 peer-disabled:opacity-70 font-medium text-sm leading-none cursor-pointer peer-disabled:cursor-not-allowed"
       >
-        {item} - ({`${count}`})
+        {item} ({`${count}`})
       </label>
     </div>
   );
